@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+     /* Form labels */
+     .form-label {
+        color: black !important;
+    }
+    
+    /* Input fields */
+    .form-control {
+        color: black !important;
+        background-color: transparent;
+    }
+    
+    /* Select dropdown */
+    .form-select {
+        color: black !important;
+        background-color: transparent;
+    }
+    
+    /* Placeholder text */
+    .form-control::placeholder {
+        color: #6c757d !important;
+    }
+    
+    /* Card body background */
+    .card-body {
+        background-color: transparent;
+    }
+    .form-control {
+        color: black !important;
+        background-color:  transparent;
+    }
+    
+    .form-select {
+        color: black !important;
+        background-color: transparent;
+    }
+    
+    .form-control::placeholder {
+        color: #6c757d !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">Paiement de la réservation #{{ reservation.id }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label for="{{ form.method.id_for_label }}" class="form-label">Méthode de paiement</label>
+                            {{ form.method }}
+                            {% if form.method.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.method.errors }}
+                            </div>
+                            <!-- Champs dynamiques selon la méthode de paiement -->
+
+
+                            {% endif %}
+                        </div>
+                         <!--
+                        <div class="mb-4">
+                            <label for="{{ form.transaction_id.id_for_label }}" class="form-label">Transaction ID</label>
+                            {{ form.transaction_id }}
+                            {% if form.transaction_id.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.transaction_id.errors }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Entrez l'identifiant unique de votre transaction de paiement.</div>
+                        </div> -->
+                        <div id="paypal-fields" style="display: none;" class="mb-4">
+    <label class="form-label" for="id_paypal_email">Email PayPal</label>
+    {{ form.paypal_email }}
+</div>
+
+<div id="visa-fields" style="display: none;" class="mb-4">
+    <label class="form-label" for="id_visa_number">Numéro Visa</label>
+    {{ form.visa_number }}
+</div>
+
+<div id="mastercard-fields" style="display: none;" class="mb-4">
+    <label class="form-label" for="id_mastercard_number">Numéro MasterCard</label>
+    {{ form.mastercard_number }}
+</div>
+
+<div id="stripe-fields" style="display: none;" class="mb-4">
+    <label class="form-label" for="id_stripe_token">Token Stripe</label>
+    {{ form.stripe_token }}
+</div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Valider le paiement
+                            </button>
+                            <a href="{% url 'client_account' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour à mon compte
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+    
+    function togglePaymentFields() {
+        const method = document.getElementById('id_method').value;
+
+        document.getElementById('paypal-fields').style.display = method === 'paypal' ? 'block' : 'none';
+        document.getElementById('visa-fields').style.display = method === 'visa' ? 'block' : 'none';
+        document.getElementById('mastercard-fields').style.display = method === 'mastercard' ? 'block' : 'none';
+        document.getElementById('stripe-fields').style.display = method === 'stripe' ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        togglePaymentFields();
+        document.getElementById('id_method').addEventListener('change', togglePaymentFields);
+    });
+
+
+</script>
+{% endblock %}
+
+{% endblock %}

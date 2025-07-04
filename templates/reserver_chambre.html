@@ -1,0 +1,22 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Réserver Chambre {{ chambre.numero }}{% endblock %}
+
+{% block extra_css %}
+<!-- Si vous avez un CSS spécifique à cette page, ajoutez-le ici -->
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Réserver Chambre {{ chambre.numero }}</h2>
+
+    <form method="POST" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Confirmer la réservation</button>
+    </form>
+
+    <a href="{% url 'client_account' %}" class="btn btn-secondary mt-3">Retour</a>
+</div>
+{% endblock %}

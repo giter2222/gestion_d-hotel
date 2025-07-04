@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter une Chambre - Admin{% endblock %}
+
+{% block content %}
+<style>
+     /* Form labels */
+     .form-label {
+        color: black !important;
+    }
+    .form-control {
+        color: black !important;
+    }
+
+</style>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">Ajouter une Chambre</h2>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="numero" class="form-label">Numéro de Chambre</label>
+                            <input type="text" class="form-control" id="numero" name="numero" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type de Chambre</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="simple">Simple</option>
+                                <option value="double">Double</option>
+                                <option value="suite">Suite</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="prix" class="form-label">Prix par Nuit (€)</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="prix" name="prix" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="disponible" name="disponible" checked>
+                            <label class="form-check-label" for="disponible">Disponible</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Ajouter la Chambre</button>
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Retour au Dashboard</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

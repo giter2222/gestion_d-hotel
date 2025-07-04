@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Compte{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <h2 class="text-center mb-5">Bienvenue {{ client.nom }}</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Client Information -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Mes Informations</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-user me-2"></i>
+                            <strong >Nom:</strong> {{ client.nom }}
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-envelope me-2"></i>
+                            <strong>Email:</strong> {{ client.email }}
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-phone me-2"></i>
+                            <strong>Téléphone:</strong> {{ client.telephone }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Mes Réservations</h4>
+                    {% if reservations %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Chambre</th>
+                                        <th>Date d'Arrivée</th>
+                                        <th>Date de Départ</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reservation in reservations %}
+                                    <tr>
+                                        <td>{{ reservation.chambre.numero }} - {{ reservation.chambre.get_type_display }}</td>
+                                        <td>{{ reservation.date_arrivee|date:"d/m/Y" }}</td>
+                                        <td>{{ reservation.date_depart|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% if reservation.date_arrivee > today %}
+                                                <span class="badge bg-info">À venir</span>
+                                            {% elif reservation.date_depart < today %}
+                                                <span class="badge bg-secondary">Terminée</span>
+                                            {% else %}
+                                                <span class="badge bg-success">En cours</span>
+                                            {% endif %}
+                                        </td>
+                                        <td> <!--
+                                            {% if not reservation.facture %}
+                                                <a href="{% url 'facture_create' reservation.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-file-invoice me-1"></i>Payer
+                                                </a>
+                                            {% endif %}-->
+                                            <a href="{% url 'generate_reservation_pdf' reservation.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-file-pdf me-1"></i>Reçu
+                                            </a>
+                                            <form action="{% url 'delete_reservation' reservation.id %}" method="post" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+                                                    <i class="fas fa-trash me-1"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">Vous n'avez pas encore de réservations.</p>
+                            <a href="{% url 'home' %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-search me-2"></i>Découvrir nos chambres
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'client_logout' %}" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt me-2"></i>Se déconnecter
+        </a>
+    </div>
+</div>
+{% endblock %}

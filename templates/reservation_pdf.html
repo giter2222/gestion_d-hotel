@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% if has_facture %}Reçu de Réservation{% else %}Confirmation de Réservation{% endif %} - {{ hotel_name }}</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            background-color: #2c3e50;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .hotel-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .hotel-icon {
+            font-size: 32px;
+            color: #ded9d5;
+        }
+        .hotel-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .hotel-details {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .receipt-title {
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 14px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .info-item {
+            margin-bottom: 10px;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+        }
+        .value {
+            color: #333;
+        }
+        .total-section {
+            margin-top: 30px;
+            text-align: right;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .total-amount {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .thank-you {
+            text-align: center;
+            margin: 30px 0;
+            font-style: italic;
+            color: #666;
+        }
+        .payment-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .payment-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .payment-completed {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        img{
+         height:40px; 
+         vertical-align:middle;
+         margin-right:3px; 
+        }
+       
+    </style>
+    <!-- Add Font Awesome for the hotel icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <div class="hotel-logo">
+            <i class="fas fa-hotel hotel-icon"></i>
+            <h1 class="hotel-name">Grand Horizon</h1>
+        </div>
+        <div class="hotel-details">
+            {{ hotel_address }}<br>
+            Tél: {{ hotel_phone }} | Email: {{ hotel_email }}
+        </div>
+    </div>
+
+    <div class="receipt-title">
+        {% if has_facture %}
+            Reçu de Réservation
+        {% else %}
+            Confirmation de Réservation
+        {% endif %}
+    </div>
+
+    {% if not has_facture %}
+    <div class="payment-status payment-pending">
+        Statut du Paiement: En attente
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <div class="section-title">Informations Client</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Nom:</span>
+                <span class="value">{{ client.nom }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Email:</span>
+                <span class="value">{{ client.email }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Téléphone:</span>
+                <span class="value">{{ client.telephone }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Détails de la Réservation</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Numéro de Réservation:</span>
+                <span class="value">#{{ reservation.id }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Chambre:</span>
+                <span class="value">{{ chambre.numero }} - {{ chambre.get_type_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Date d'Arrivée:</span>
+                <span class="value">{{ reservation.date_arrivee|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Date de Départ:</span>
+                <span class="value">{{ reservation.date_depart|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Prix par Nuit:</span>
+                <span class="value">{{ chambre.prix_par_nuit }} €</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Nombre de Nuits:</span>
+                <span class="value">{{ nombre_nuits }} nuit(s)</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Calcul du Total:</span>
+                <span class="value">{{ nombre_nuits }} nuit(s) × {{ chambre.prix_par_nuit }} € = {{ montant_total }} €</span>
+            </div>
+        </div>
+    </div>
+
+    {% if has_facture %}
+    <div class="section">
+        <div class="section-title">Détails du Paiement</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Numéro de Facture:</span>
+                <span class="value">#{{ facture.id_facture }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Date de Paiement:</span>
+                <span class="value">{{ facture.date_paiement|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Méthode de Paiement:</span>
+                
+                <span class="value">{{ facture.method }}</span>
+                <div> </div>
+                {% if facture.method == 'visa' %}
+    <div class="payment-method visa">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa">
+        <p>Visa payment selected</p>
+    </div>
+{% elif facture.method == 'mastercard' %}
+    <div class="payment-method mastercard">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard">
+        <p>Mastercard payment selected</p>
+    </div>
+{% elif facture.method == 'paypal' %}
+    <div class="payment-method paypal">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1280px-PayPal.svg.png" alt="PayPal">
+        <p>PayPal payment selected</p>
+    </div>
+{% elif facture.method == 'stripe' %}
+    <div class="payment-method stripe">
+        <img src="https://cdn.worldvectorlogo.com/logos/stripe-4.svg" alt="Stripe">
+        <p>Stripe payment selected</p>
+    </div>
+{% else %}
+    <div class="payment-method unknown">
+        <p>Please select a payment method</p>
+    </div>
+{% endif %}
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="total-section">
+        <div class="info-item">
+            <span class="label">Montant Total Payé:</span>
+            <span class="total-amount">{{ facture.montant }} €</span>
+        </div>
+    </div>
+    {% else %}
+    <div class="total-section">
+        <div class="info-item">
+            <span class="label">Montant Total à Payer:</span>
+            <span class="total-amount">{{ montant_total }} €</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="thank-you">
+        Merci d'avoir choisi {{ hotel_name }} pour votre séjour.<br>
+        {% if not has_facture %}
+        Pour finaliser votre réservation, veuillez effectuer le paiement en utilisant le bouton "Payer" sur votre espace client.<br>
+        {% endif %}
+        Nous espérons vous accueillir à nouveau très bientôt.
+    </div>
+
+    <div class="footer">
+        {% if has_facture %}
+        Ce document fait office de reçu officiel.<br>
+        {% else %}
+        Ce document fait office de confirmation de réservation.<br>
+        {% endif %}
+        Pour toute question concernant votre réservation, veuillez nous contacter au {{ hotel_phone }} ou par email à {{ hotel_email }}.
+    </div>
+</body>
+</html> 

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Chambres disponibles du {{ date_arrivee|date:"d/m/Y" }} au {{ date_depart|date:"d/m/Y" }}</h2>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for chambre in chambres %}
+        <div class="col">
+            <div class="card h-100 shadow">
+                 {% if chambre.type == 'Double' %}
+                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32" class="card-img-top" alt="Chambre Double" style="height: 250px; object-fit: cover;">
+                    {% elif chambre.type == 'Suite' %}
+                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3" class="card-img-top" alt="Suite" style="height: 250px; object-fit: cover;">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" class="card-img-top" alt="Chambre Simple" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        {{ chambre.numero }} - {{ chambre.get_type_display }}
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-0"><strong>Prix/nuit:</strong></p>
+                            <h4 class="text-primary">{{ chambre.prix_par_nuit }} €</h4>
+                        </div>
+                        
+                        <div class="col-6">
+                            <p class="mb-0"><strong>Disponibilité:</strong></p>
+                            <span class="badge bg-success">Disponible</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'reserver_chambre' chambre.id %}" 
+                       class="btn btn-success w-100">
+                        <i class="bi bi-bookmark-check"></i> Réserver maintenant
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning">
+                Aucune chambre disponible pour ces critères
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

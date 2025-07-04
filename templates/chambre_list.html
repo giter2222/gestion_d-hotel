@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Chambres Disponibles{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-5">Nos Chambres Disponibles</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if chambres %}
+    <!-- 
+      Suite: [https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+    ],
+    Simple: [https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+    ],
+    Double: [https://images.unsplash.com/photo-1590490359683-658d3d23f972?ixlib=rb-4.0.3
+      ""
+    ] -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for chambre in chambres %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    {% if chambre.type == 'Double' %}
+                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32" class="card-img-top" alt="Chambre Double" style="height: 250px; object-fit: cover;">
+                    {% elif chambre.type == 'Suite' %}
+                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3" class="card-img-top" alt="Suite" style="height: 250px; object-fit: cover;">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" class="card-img-top" alt="Chambre Simple" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">Chambre {{ chambre.numero }}</h5>
+                        <p class="card-text">
+                            <span class="badge bg-primary mb-2">{{ chambre.get_type_display }}</span>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h5 mb-0">{{ chambre.prix_par_nuit }} €</span>
+                            <small class="text-muted">par nuit</small>
+                        </div>
+                        <ul class="list-unstyled mb-4">
+                            {% if chambre.type == 'double' %}
+                                <li><i class="fas fa-bed me-2"></i>Lit King Size</li>
+                                <li><i class="fas fa-wifi me-2"></i>WiFi Gratuit</li>
+                                <li><i class="fas fa-tv me-2"></i>TV 55" 4K</li>
+                            {% elif chambre.type == 'suite' %}
+                                <li><i class="fas fa-bed me-2"></i>Lit King Size</li>
+                                <li><i class="fas fa-hot-tub me-2"></i>Jacuzzi Privé</li>
+                                <li><i class="fas fa-couch me-2"></i>Salon Privé</li>
+                                <li><i class="fas fa-concierge-bell me-2"></i>Service VIP</li>
+                            {% else %}
+                                <li><i class="fas fa-bed me-2"></i>Lit Queen Size</li>
+                                <li><i class="fas fa-wifi me-2"></i>WiFi Gratuit</li>
+                                <li><i class="fas fa-tv me-2"></i>TV 43" HD</li>
+                            {% endif %}
+                        </ul>
+                        {% if request.session.client_id %}
+                            <div class="d-grid">
+                                <a href="{% url 'reserver_chambre' chambre.id %}" class="btn btn-primary">
+                                    <i class="fas fa-calendar-check me-2"></i>Réserver
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <a href="{% url 'client_login' %}" class="alert-link">Connectez-vous</a> pour réserver
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-bed fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Aucune chambre disponible pour le moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

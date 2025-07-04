@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Grand Horizon{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                    url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #e67e22;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .chart-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .recent-activity {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        color : black ;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .dashboard-title {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        margin-bottom: 2rem;
+    }
+    .mb-4 {
+        color : black ;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container">
+        <h1 class="dashboard-title text-center mb-5">Tableau de Bord</h1>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-bed stat-icon"></i>
+                    <div class="stat-number" id="chambres-total">0</div>
+                    <div class="stat-label">Chambres Total</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-users stat-icon"></i>
+                    <div class="stat-number" id="clients-total">0</div>
+                    <div class="stat-label">Clients Total</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check stat-icon"></i>
+                    <div class="stat-number" id="reservations-total">0</div>
+                    <div class="stat-label">Réservations Total</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="mb-4">Disponibilité des Chambres</h4>
+                    <canvas id="disponibiliteChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="mb-4">Types de Chambres</h4>
+                    <canvas id="typesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-12">
+                <div class="recent-activity">
+                    <h4 class="mb-4">Activité Récente</h4>
+                    <div class="activity">
+                        <i class="fas fa-clock me-2"></i>
+                        <span>Dernière mise à jour: <span id="last-update">-</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch dashboard data
+        fetch('/dashboard/data/')
+            .then(response => response.json())
+            .then(data => {
+                // Update statistics
+                document.getElementById('chambres-total').textContent = data.chambres_total;
+                document.getElementById('clients-total').textContent = data.clients_total;
+                document.getElementById('reservations-total').textContent = data.reservations_total;
+
+                // Update last update time
+                document.getElementById('last-update').textContent = new Date().toLocaleString();
+
+                // Create availability chart
+                new Chart(document.getElementById('disponibiliteChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Disponibles', 'Occupées'],
+                        datasets: [{
+                            data: [data.chambres_disponibles, data.chambres_non_disponibles],
+                            backgroundColor: ['#2ecc71', '#e74c3c']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+                // Create types chart
+                new Chart(document.getElementById('typesChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.types_data.map(item => item.type),
+                        datasets: [{
+                            label: 'Nombre de chambres',
+                            data: data.types_data.map(item => item.total),
+                            backgroundColor: '#3498db'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}

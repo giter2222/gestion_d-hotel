@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-5">Mes Réservations</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if reservations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Chambre</th>
+                                <th>Date d'Arrivée</th>
+                                <th>Date de Départ</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation in reservations %}
+                            <tr>
+                                <td>{{ reservation.chambre.numero }} - {{ reservation.chambre.get_type_display }}</td>
+                                <td>{{ reservation.date_arrivee|date:"d/m/Y" }}</td>
+                                <td>{{ reservation.date_depart|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if reservation.date_arrivee > today %}
+                                        <span class="badge bg-info">À venir</span>
+                                    {% elif reservation.date_depart < today %}
+                                        <span class="badge bg-secondary">Terminée</span>
+                                    {% else %}
+                                        <span class="badge bg-success">En cours</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not reservation.facture %}
+                                        <a href="{% url 'facture_create' reservation.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-file-invoice me-1"></i>Payer
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-success">Payée</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Vous n'avez pas encore de réservations.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-search me-2"></i>Découvrir nos chambres
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
